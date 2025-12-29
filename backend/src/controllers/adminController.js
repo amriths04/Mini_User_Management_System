@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import User from "../models/userModel.js";
 
 
 export const getAllUsers = async (req, res) => {
@@ -28,6 +28,60 @@ export const getAllUsers = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch users"
+    });
+  }
+};
+
+
+export const activateUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    user.status = "active";
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "User activated successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to activate user"
+    });
+  }
+};
+
+
+export const deactivateUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    user.status = "inactive";
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "User deactivated successfully"
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to deactivate user"
     });
   }
 };
