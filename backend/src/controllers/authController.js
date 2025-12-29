@@ -94,3 +94,13 @@ export const login = async (req, res) => {
   }
 };
 
+
+export const getMe = async (req, res) => {
+  // req.user is set by auth middleware
+  return res.status(200).json(req.user);
+};
+
+
+export const logout = async (req, res) => {
+  return res.status(200).json({ message: "Logged out successfully" });
+};
