@@ -15,38 +15,42 @@ export default function Login() {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setError("");
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
 
-        if (!isValidEmail(email)) {
-            setError("Please enter a valid email address");
-            return;
-        }
+  if (!email.trim()) {
+    setError("Email is required");
+    return;
+  }
 
-        // Required field check
-        if (!email || !password) {
-            setError("Email and password are required");
-            return;
-        }
+  if (!isValidEmail(email)) {
+    setError("Please enter a valid email address");
+    return;
+  }
 
-        try {
-            setLoading(true);
+  if (!password) {
+    setError("Password is required");
+    return;
+  }
 
-            const data = await loginUser(email, password);
+  try {
+    setLoading(true);
 
-            // Redirect logic-rolebased
-            if (data.user.role === "admin") {
-                navigate("/admin", { replace: true });
-            } else {
-                navigate("/profile", { replace: true });
-            }
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const data = await loginUser(email, password);
+
+    // Role-based redirect
+    if (data.user.role === "admin") {
+      navigate("/admin", { replace: true });
+    } else {
+      navigate("/profile", { replace: true });
+    }
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
     return (
         <div className="login-container">
