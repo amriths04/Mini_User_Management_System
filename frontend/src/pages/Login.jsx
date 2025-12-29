@@ -1,40 +1,62 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { loginUser } from "../services/authService";
 import "../css/Login.css";
 
-const Login = () => {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const submitHandler = async (e) => {
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!email || !password) {
-      return setError("All fields are required");
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
     }
 
-    const result = await loginUser(email, password);
+    // 🔴 Required field check
+    if (!email || !password) {
+      setError("Email and password are required");
+      return;
+    }
 
-    if (result.error) {
-      setError(result.error);
-    } else {
-      localStorage.setItem("token", result.token);
-      navigate("/profile");
+    try {
+      setLoading(true);
+        
+      const data = await loginUser(email, password);
+
+      // 🔴 Redirect logic (RBAC)
+      if (data.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/profile");
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-  <div className="login-page">
     <div className="login-container">
       <h2>Login</h2>
 
-      {error && <div className="login-error">{error}</div>}
+      {error && <p className="error-text">{error}</p>}
 
-      <form className="login-form" onSubmit={submitHandler}>
+      <form onSubmit={handleLogin}>
         <input
+          type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -47,16 +69,14 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
 
-      <div className="login-footer">
+      <p>
         Don’t have an account? <Link to="/signup">Signup</Link>
-      </div>
+      </p>
     </div>
-  </div>
-);
-};
-
-
-export default Login;
+  );
+}
