@@ -36,6 +36,12 @@ export const getAllUsers = async (req, res) => {
 export const activateUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
+    if (req.user._id.toString() === req.params.id) {
+  return res.status(400).json({
+    success: false,
+    message: "You cannot modify your own account"
+  });
+}
 
     if (!user) {
       return res.status(404).json({
@@ -63,6 +69,12 @@ export const activateUser = async (req, res) => {
 export const deactivateUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
+    if (req.user._id.toString() === req.params.id) {
+  return res.status(400).json({
+    success: false,
+    message: "You cannot modify your own account"
+  });
+}
 
     if (!user) {
       return res.status(404).json({
