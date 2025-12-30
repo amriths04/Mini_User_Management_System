@@ -1,0 +1,30 @@
+.profile-container {
+  max-width: 500px;
+  padding: 24px;
+}
+
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.profile-section h3 {
+  margin-bottom: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.error-text {
+  color: #c62828;
+  margin-bottom: 10px;
+}
+
+.success-text {
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
