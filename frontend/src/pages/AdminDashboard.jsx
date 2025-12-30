@@ -1,36 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Button from "../components/Button";
 import "../css/AdminDashboard.css";
 import Modal from "../components/Modal";
+import { getAllUsers } from "../services/adminService";
 
 export default function AdminDashboard() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      email: "test@gmail.com",
-      fullName: "Test User",
-      role: "user",
-      status: "active",
-    },
-    {
-      id: 2,
-      email: "admin@gmail.com",
-      fullName: "Admin User",
-      role: "admin",
-      status: "inactive",
-    },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const res = await getAllUsers(page);
+        setUsers(res.data);
+        setTotalPages(res.pagination.totalPages);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [page]);
 
   return (
     <>
       <Navbar />
-
+    <div className="page-content">
       <div className="admin-container">
         <h2>Admin Dashboard</h2>
 
@@ -63,7 +70,7 @@ export default function AdminDashboard() {
                 </tr>
               ) : (
                 users.map((user) => (
-                  <tr key={user.id}>
+                  <tr key={user._id}>
                     <td>{user.email}</td>
                     <td>{user.fullName}</td>
                     <td>{user.role}</td>
@@ -98,14 +105,29 @@ export default function AdminDashboard() {
           </table>
         </div>
 
-        {/* Pagination UI */}
         <div className="pagination">
-          <Button variant="secondary">Prev</Button>
-          <span>Page 1</span>
-          <Button variant="secondary">Next</Button>
+          <Button
+            variant="secondary"
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+          >
+            Prev
+          </Button>
+
+          <span>
+            Page {page} of {totalPages}
+          </span>
+
+          <Button
+            variant="secondary"
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next
+          </Button>
         </div>
       </div>
-            <Modal
+      <Modal
         isOpen={isModalOpen}
         title="Confirm Action"
         message={
@@ -123,6 +145,7 @@ export default function AdminDashboard() {
           setSelectedUser(null);
         }}
       />
+      </div>
     </>
   );
 }
