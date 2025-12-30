@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import "../css/Navbar.css";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  const { user, logout } = useAuth();
 
   if (!user) return null;
 

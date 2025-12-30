@@ -3,12 +3,14 @@ import Navbar from "../components/Navbar";
 import "../css/UserProfile.css";
 import Button from "../components/Button";
 import Input from "../components/Input";
-import { getMe } from "../services/userService";
+import { getMe, updateProfile, changePassword } from "../services/userService";
+import { useAuth } from "../context/AuthContext";
 
 export default function UserProfile() {
   const [userInfo, setUserInfo] = useState(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const { refreshUser } = useAuth();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -69,10 +71,15 @@ export default function UserProfile() {
 
     try {
       setLoading(true);
+      const res = await updateProfile({ fullName, email });
+      if (res.user) {
+        setUserInfo(res.user);
+      }
+      await refreshUser();
       setSuccess("Profile updated successfully");
       setFieldErrors({});
-    } catch {
-      setError("Failed to update profile");
+    } catch (err) {
+      setError(err.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -97,12 +104,15 @@ export default function UserProfile() {
 
     try {
       setLoading(true);
+      await changePassword({
+        currentPassword,
+        newPassword,
+      });
+
       setSuccess("Password updated successfully");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch {
-      setError("Failed to update password");
+      clearPasswordFields();
+    } catch (err) {
+      setError(err.message || "Failed to update password");
     } finally {
       setLoading(false);
     }
@@ -112,132 +122,132 @@ export default function UserProfile() {
     <>
       <Navbar />
       <div className="page-content">
-      <div className="profile-container">
-        <h2>User Profile</h2>
+        <div className="profile-container">
+          <h2>User Profile</h2>
 
-        {/* 🔹 User Information */}
-        {userInfo && (
+          {/* 🔹 User Information */}
+          {userInfo && (
+            <div className="profile-section">
+              <h3>User Information</h3>
+              <table className="user-info-table">
+                <tbody>
+                  <tr>
+                    <td>Full Name</td>
+                    <td>{userInfo.fullName}</td>
+                  </tr>
+
+                  <tr>
+                    <td>Email</td>
+                    <td>{userInfo.email}</td>
+                  </tr>
+                  <tr>
+                    <td>User ID</td>
+                    <td>{userInfo._id}</td>
+                  </tr>
+                  <tr>
+                    <td>Role</td>
+                    <td>{userInfo.role}</td>
+                  </tr>
+                  <tr>
+                    <td>Status</td>
+                    <td>
+                      <span className={`status-pill ${userInfo.status}`}>
+                        {userInfo.status}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
           <div className="profile-section">
-            <h3>User Information</h3>
+            <h3>Update Profile</h3>
 
-            <table className="user-info-table">
-              <tbody>
-                <tr>
-                  <td>User ID</td>
-                  <td>{userInfo._id}</td>
-                </tr>
-                <tr>
-                  <td>Role</td>
-                  <td>{userInfo.role}</td>
-                </tr>
-                <tr>
-                  <td>Status</td>
-                  <td>
-                    <span className={`status-pill ${userInfo.status}`}>
-                      {userInfo.status}
-                    </span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Last Login</td>
-                  <td>{formatDate(userInfo.lastLogin)}</td>
-                </tr>
-                <tr>
-                  <td>Account Created</td>
-                  <td>{formatDate(userInfo.createdAt)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        <div className="profile-section">
-          <h3>Profile Information</h3>
-
-          <Input
-            label="Full Name"
-            value={fullName}
-            onChange={(e) => {
-              setFullName(e.target.value);
-              setFieldErrors((p) => ({ ...p, fullName: "" }));
-            }}
-            onBlur={() => markTouched("fullName")}
-            touched={touched.fullName}
-            error={fieldErrors.fullName}
-          />
-
-          <Input
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setFieldErrors((p) => ({ ...p, email: "" }));
-            }}
-            onBlur={() => markTouched("email")}
-            touched={touched.email}
-            error={fieldErrors.email}
-          />
-
-          <div className="actions">
-            <Button
-              variant="primary"
-              loading={loading}
-              onClick={handleProfileUpdate}
-            >
-              Save
-            </Button>
-
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setFullName(userInfo.fullName);
-                setEmail(userInfo.email);
+            <Input
+              label="Full Name"
+              value={fullName}
+              onChange={(e) => {
+                setFullName(e.target.value);
+                setFieldErrors((p) => ({ ...p, fullName: "" }));
               }}
-            >
-              Cancel
-            </Button>
+              onBlur={() => markTouched("fullName")}
+              touched={touched.fullName}
+              error={fieldErrors.fullName}
+            />
+
+            <Input
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setFieldErrors((p) => ({ ...p, email: "" }));
+              }}
+              onBlur={() => markTouched("email")}
+              touched={touched.email}
+              error={fieldErrors.email}
+            />
+
+            <div className="actions">
+              <Button
+                variant="primary"
+                loading={loading}
+                onClick={handleProfileUpdate}
+              >
+                Save
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setFullName(userInfo.fullName);
+                  setEmail(userInfo.email);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+          {error && <p className="error-text">{error}</p>}
+          {success && <p className="success-text">{success}</p>}
+          <div className="profile-section">
+            <h3>Change Password</h3>
+
+            <Input
+              label="Current Password"
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+
+            <Input
+              label="New Password"
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+
+            <Input
+              label="Confirm New Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <div className="actions">
+              <Button
+                variant="primary"
+                loading={loading}
+                onClick={handlePasswordChange}
+              >
+                Update Password
+              </Button>
+              <Button variant="secondary" onClick={clearPasswordFields}>
+                Clear
+              </Button>
+            </div>
           </div>
         </div>
-        {error && <p className="error-text">{error}</p>}
-        {success && <p className="success-text">{success}</p>}
-        <div className="profile-section">
-          <h3>Change Password</h3>
-
-          <Input
-            label="Current Password"
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-          />
-
-          <Input
-            label="New Password"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-
-          <Input
-            label="Confirm New Password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-          <div className="actions">
-            <Button
-              variant="primary"
-              loading={loading}
-              onClick={handlePasswordChange}
-            >
-              Update Password
-            </Button>
-            <Button variant="secondary" onClick={clearPasswordFields}>
-              Clear
-            </Button>
-          </div>
-        </div>
-      </div>
       </div>
     </>
   );
