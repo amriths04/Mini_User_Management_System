@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../services/authService";
 import "../css/Login.css";
@@ -10,6 +10,21 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+
+    if (token && user) {
+      const parsedUser = JSON.parse(user);
+
+      if (parsedUser.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/profile", { replace: true });
+      }
+      }
+    }, [navigate]);
 
     const isValidEmail = (email) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
