@@ -93,7 +93,7 @@ export default function AdminDashboard() {
                         {user.status === "active" ? (
                           <Button
                             variant="danger"
-                            disabled={loading}
+                            loading={loading}
                             onClick={() => {
                               setSelectedUser(user);
                               setIsModalOpen(true);
@@ -104,7 +104,7 @@ export default function AdminDashboard() {
                         ) : (
                           <Button
                             variant="primary"
-                            disabled={loading}
+                            loading={loading}
                             onClick={() => {
                               setSelectedUser(user);
                               setIsModalOpen(true);

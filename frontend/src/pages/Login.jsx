@@ -4,6 +4,8 @@ import { loginUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 import "../css/Login.css";
 import {} from '../components/Button'
+import LoadingSpinner from "../components/LoadingSpinner";
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -91,7 +93,7 @@ export default function Login() {
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? <LoadingSpinner size="small" /> : "Login"}
         </button>
       </form>
 

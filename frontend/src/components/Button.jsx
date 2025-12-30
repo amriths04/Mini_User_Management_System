@@ -1,4 +1,5 @@
 import "../css/Button.css";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function Button({
   children,
@@ -15,7 +16,7 @@ export default function Button({
       disabled={disabled || loading}
       onClick={onClick}
     >
-      {loading ? "Please wait..." : children}
+      {loading ? <LoadingSpinner size="small" /> : children}
     </button>
   );
 }

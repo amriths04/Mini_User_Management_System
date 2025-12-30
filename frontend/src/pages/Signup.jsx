@@ -137,7 +137,7 @@ export default function Signup() {
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? "Creating account..." : "Signup"}
+           {loading ? <LoadingSpinner size="small" /> : "Signup"}
         </button>
       </form>
 
