@@ -1,7 +1,8 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { signupUser } from "../services/authService";
 import "../css/Signup.css";
+import { useAuth } from "../context/AuthContext";
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
@@ -12,79 +13,93 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { user, authChecked } = useAuth();
 
   useEffect(() => {
-  const token = localStorage.getItem("token");
-  const user = localStorage.getItem("user");
+    if (!authChecked) return;
 
-  if (token && user) {
-    const parsedUser = JSON.parse(user);
-
-    if (parsedUser.role === "admin") {
-      navigate("/admin", { replace: true });
-    } else {
+    if (user) {
       navigate("/profile", { replace: true });
     }
+  }, [user, authChecked, navigate]);
+
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const validatePassword = (password) => {
+    if (password.length < 6) {
+      return "Password must be at least 6 characters long";
     }
-    }, [navigate]);
 
-  const isValidEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!/[a-z]/.test(password)) {
+      return "Password must contain at least one lowercase letter";
+    }
 
-  const isStrongPassword = (password) =>
-    password.length >= 6;
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
 
-const handleSignup = async (e) => {
-  e.preventDefault();
-  setError("");
+    if (!/\d/.test(password)) {
+      return "Password must contain at least one number";
+    }
 
-  if (!fullName.trim()) {
-    setError("Full name is required");
-    return;
-  }
+    if (!/[@$!%*?&]/.test(password)) {
+      return "Password must contain at least one special character (@$!%*?&)";
+    }
 
-  if (!email.trim()) {
-    setError("Email is required");
-    return;
-  }
+    return null;
+  };
 
-  if (!isValidEmail(email)) {
-    setError("Please enter a valid email address");
-    return;
-  }
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  if (!password) {
-    setError("Password is required");
-    return;
-  }
+    if (!fullName.trim()) {
+      setError("Full name is required");
+      return;
+    }
 
-  if (!isStrongPassword(password)) {
-    setError("Password must be at least 6 characters long");
-    return;
-  }
+    if (!email.trim()) {
+      setError("Email is required");
+      return;
+    }
 
-  if (!confirmPassword) {
-    setError("Please confirm your password");
-    return;
-  }
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
 
-  if (password !== confirmPassword) {
-    setError("Passwords do not match");
-    return;
-  }
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
 
-  try {
-    setLoading(true);
-    await signupUser(fullName, email, password);
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
 
-    navigate("/login", { replace: true });
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    if (!confirmPassword) {
+      setError("Please confirm your password");
+      return;
+    }
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await signupUser(fullName, email, password);
+
+      navigate("/login", { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="signup-container">

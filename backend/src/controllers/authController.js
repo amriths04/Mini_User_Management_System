@@ -17,10 +17,36 @@ export const signup = async (req, res) => {
     }
 
     // Password strength validation
-    if (password.length < 6) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 6 characters long" });
+    const validatePassword = (password) => {
+      if (password.length < 6) {
+        return "Password must be at least 6 characters long";
+      }
+
+      if (!/[a-z]/.test(password)) {
+        return "Password must contain at least one lowercase letter";
+      }
+
+      if (!/[A-Z]/.test(password)) {
+        return "Password must contain at least one uppercase letter";
+      }
+
+      if (!/\d/.test(password)) {
+        return "Password must contain at least one number";
+      }
+
+      if (!/[@$!%*?&]/.test(password)) {
+        return "Password must contain at least one special character (@$!%*?&)";
+      }
+
+      return null;
+    };
+    const passwordError = validatePassword(password);
+
+    if (passwordError) {
+      return res.status(400).json({
+        success: false,
+        message: passwordError,
+      });
     }
 
     // Check existing user
@@ -33,7 +59,7 @@ export const signup = async (req, res) => {
     const user = await User.create({
       fullName,
       email,
-      password
+      password,
     });
 
     // Token on signup
@@ -41,7 +67,7 @@ export const signup = async (req, res) => {
 
     res.status(201).json({
       message: "User registered successfully",
-      token
+      token,
     });
   } catch (error) {
     console.error(error);
@@ -49,14 +75,13 @@ export const signup = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
-        message: "Email and password are required"
+        message: "Email and password are required",
       });
     }
 
@@ -84,29 +109,27 @@ export const login = async (req, res) => {
     // Token on login
     const token = generateToken(user._id);
 
-     res.status(200).json({
-    success: true,
-    token,
-    user: {
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-    },
-  });
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        status: user.status,
+      },
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-
 export const getMe = async (req, res) => {
   // req.user is set by auth middleware
   return res.status(200).json(req.user);
 };
-
 
 export const logout = async (req, res) => {
   return res.status(200).json({ message: "Logged out successfully" });
