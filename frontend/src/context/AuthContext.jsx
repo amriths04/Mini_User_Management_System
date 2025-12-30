@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
       const me = await getMe();
       setUser(me);
     } catch {
+        if (err?.name === "AbortError") return;
         localStorage.removeItem("token");
       setUser(null);
     }finally{
