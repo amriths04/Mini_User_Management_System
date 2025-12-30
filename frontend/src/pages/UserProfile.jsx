@@ -111,7 +111,7 @@ export default function UserProfile() {
   return (
     <>
       <Navbar />
-
+      <div className="page-content">
       <div className="profile-container">
         <h2>User Profile</h2>
 
@@ -237,6 +237,7 @@ export default function UserProfile() {
             </Button>
           </div>
         </div>
+      </div>
       </div>
     </>
   );
