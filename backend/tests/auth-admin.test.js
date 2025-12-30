@@ -55,10 +55,11 @@ describe("Auth + Admin Access Tests", () => {
 
     expect(res.statusCode).toBe(403);
   });
-  
+
   test("Access /me without token should fail", async () => {
   const res = await request(app).get("/api/auth/me");
   expect(res.statusCode).toBe(401);
 });
 
 });
+
