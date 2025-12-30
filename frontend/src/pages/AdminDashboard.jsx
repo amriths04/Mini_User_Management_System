@@ -3,7 +3,11 @@ import Navbar from "../components/Navbar";
 import Button from "../components/Button";
 import "../css/AdminDashboard.css";
 import Modal from "../components/Modal";
-import { getAllUsers } from "../services/adminService";
+import {
+  getAllUsers,
+  activateUser,
+  deactivateUser,
+} from "../services/adminService";
 
 export default function AdminDashboard() {
   const [users, setUsers] = useState([]);
@@ -37,114 +41,144 @@ export default function AdminDashboard() {
   return (
     <>
       <Navbar />
-    <div className="page-content">
-      <div className="admin-container">
-        <h2>Admin Dashboard</h2>
+      <div className="page-content">
+        <div className="admin-container">
+          <h2>Admin Dashboard</h2>
 
-        {error && <p className="error-text">{error}</p>}
+          {error && <p className="error-text">{error}</p>}
 
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Email</th>
-                <th>Full Name</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {loading ? (
+          <div className="table-wrapper">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="5" className="center-text">
-                    Loading users...
-                  </td>
+                  <th>Email</th>
+                  <th>Full Name</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ) : users.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="center-text">
-                    No users found
-                  </td>
-                </tr>
-              ) : (
-                users.map((user) => (
-                  <tr key={user._id}>
-                    <td>{user.email}</td>
-                    <td>{user.fullName}</td>
-                    <td>{user.role}</td>
-                    <td>{user.status}</td>
-                    <td>
-                      {user.status === "active" ? (
-                        <Button
-                          variant="danger"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setIsModalOpen(true);
-                          }}
-                        >
-                          Deactivate
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="primary"
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setIsModalOpen(true);
-                          }}
-                        >
-                          Activate
-                        </Button>
-                      )}
+              </thead>
+
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="center-text">
+                      Loading users...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : users.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="center-text">
+                      No users found
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user._id}>
+                      <td>{user.email}</td>
+                      <td>{user.fullName}</td>
+                      <td>{user.role}</td>
+                      <td>{user.status}</td>
+                      <td>
+                        {user.status === "active" ? (
+                          <Button
+                            variant="danger"
+                            disabled={loading}
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            Deactivate
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="primary"
+                            disabled={loading}
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            Activate
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="pagination">
+            <Button
+              variant="secondary"
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Prev
+            </Button>
+
+            <span>
+              Page {page} of {totalPages}
+            </span>
+
+            <Button
+              variant="secondary"
+              disabled={page === totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
         </div>
+        <Modal
+          isOpen={isModalOpen}
+          title="Confirm Action"
+          message={
+            selectedUser?.status === "active"
+              ? "Are you sure you want to deactivate this user?"
+              : "Are you sure you want to activate this user?"
+          }
+          onCancel={() => {
+            setIsModalOpen(false);
+            setSelectedUser(null);
+          }}
+          onConfirm={async () => {
+            try {
+              setLoading(true);
 
-        <div className="pagination">
-          <Button
-            variant="secondary"
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Prev
-          </Button>
+              if (selectedUser.status === "active") {
+                await deactivateUser(selectedUser._id);
+              } else {
+                await activateUser(selectedUser._id);
+              }
 
-          <span>
-            Page {page} of {totalPages}
-          </span>
+              // ✅ Update UI instantly
+              setUsers((prev) =>
+                prev.map((u) =>
+                  u._id === selectedUser._id
+                    ? {
+                        ...u,
+                        status:
+                          selectedUser.status === "active"
+                            ? "inactive"
+                            : "active",
+                      }
+                    : u
+                )
+              );
 
-          <Button
-            variant="secondary"
-            disabled={page === totalPages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-      <Modal
-        isOpen={isModalOpen}
-        title="Confirm Action"
-        message={
-          selectedUser?.status === "active"
-            ? "Are you sure you want to deactivate this user?"
-            : "Are you sure you want to activate this user?"
-        }
-        onCancel={() => {
-          setIsModalOpen(false);
-          setSelectedUser(null);
-        }}
-        onConfirm={() => {
-          // 🔧 Backend API call will go here later
-          setIsModalOpen(false);
-          setSelectedUser(null);
-        }}
-      />
+              setIsModalOpen(false);
+              setSelectedUser(null);
+            } catch (err) {
+              setError(err.message);
+            } finally {
+              setLoading(false);
+            }
+          }}
+        />
       </div>
     </>
   );

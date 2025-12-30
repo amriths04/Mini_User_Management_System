@@ -31,8 +31,8 @@ export default function UserProfile() {
 
   if (user) {
     setUserInfo(user);
-    setFullName(user.fullName);
-    setEmail(user.email);
+    setFullName();
+    setEmail();
   }
 }, [user]);
 
@@ -198,8 +198,8 @@ export default function UserProfile() {
               <Button
                 variant="secondary"
                 onClick={() => {
-                  setFullName(userInfo.fullName);
-                  setEmail(userInfo.email);
+                  setFullName("");
+                  setEmail("");
                 }}
               >
                 Cancel

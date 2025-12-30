@@ -1,103 +1,100 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 import "../css/Login.css";
 
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const { refreshUser } = useAuth();
-    const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { refreshUser, user, authChecked } = useAuth();
+  const navigate = useNavigate();
 
-    // useEffect(() => {
-    // const token = localStorage.getItem("token");
-    // const user = localStorage.getItem("user");
+  useEffect(() => {
+    if (!authChecked) return;
 
-    // if (token && user) {
-    //   const parsedUser = JSON.parse(user);
-
-    //   if (parsedUser.role === "admin") {
-    //     navigate("/admin", { replace: true });
-    //   } else {
-    //     navigate("/profile", { replace: true });
-    //   }
-    //   }
-    // }, [navigate]);
-
-    const isValidEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    };
-
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
-
-  if (!email.trim()) {
-    setError("Email is required");
-    return;
-  }
-
-  if (!isValidEmail(email)) {
-    setError("Please enter a valid email address");
-    return;
-  }
-
-  if (!password) {
-    setError("Password is required");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const data = await loginUser(email, password);
-    // localStorage.setItem("user", JSON.stringify(data.user));
-    await refreshUser();
-    // Role-based redirect
-    if (data.user.role === "admin") {
-      navigate("/admin", { replace: true });
-    } else {
-      navigate("/profile", { replace: true });
+    if (user) {
+      if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/profile", { replace: true });
+      }
     }
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  }, [user, authChecked, navigate]);
 
-    return (
-        <div className="login-container">
-            <h2>Login</h2>
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
-            {error && <p className="error-text">{error}</p>}
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
 
-            <form onSubmit={handleLogin}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+    if (!email.trim()) {
+      setError("Email is required");
+      return;
+    }
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
 
-                <button type="submit" disabled={loading}>
-                    {loading ? "Logging in..." : "Login"}
-                </button>
-            </form>
+    if (!password) {
+      setError("Password is required");
+      return;
+    }
 
-            <p>
-                Don’t have an account? <Link to="/signup">Signup</Link>
-            </p>
-        </div>
-    );
+    try {
+      setLoading(true);
+
+      const data = await loginUser(email, password);
+      // localStorage.setItem("user", JSON.stringify(data.user));
+      await refreshUser();
+      // Role-based redirect
+      if (data.user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/profile", { replace: true });
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <h2>Login</h2>
+
+      {error && <p className="error-text">{error}</p>}
+
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
+
+      <p>
+        Don’t have an account? <Link to="/signup">Signup</Link>
+      </p>
+    </div>
+  );
 }
