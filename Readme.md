@@ -163,7 +163,7 @@ npm test
 API documentation is provided via a **Postman Collection** that contains all backend endpoints with example requests, headers, and responses.
 
 🔗 **Postman Collection Link**  
-https://www.postman.com/workspace/My-Workspace~af2e01d9-e537-41ee-844c-921be49e36df/collection/38173124-0238acd4-4969-4a22-ad08-fdf13effe676?action=share&creator=38173124
+https://www.postman.com/mission-meteorologist-84361860/public/collection/38173124-0238acd4-4969-4a22-ad08-fdf13effe676/?action=share&creator=38173124
 
 ### What’s Included ###
 
