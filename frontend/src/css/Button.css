@@ -36,10 +36,10 @@
 
 /* ---------- destructive action button ---------- */
 .btn-danger {
-  background-color: #760705;
+  background-color: #f50c0c;
   color: white;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #f50c0c;
+  background-color: #760705;
 }

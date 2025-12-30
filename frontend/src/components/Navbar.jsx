@@ -1,12 +1,16 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "../css/Navbar.css";
 import { useAuth } from "../context/AuthContext";
+import Button from "../components/Button";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
 
   if (!user) return null;
+
+  const currentPath = location.pathname;
 
   const handleLogout = () => {
     logout();
@@ -19,24 +23,31 @@ export default function Navbar() {
         <span className="brand">Mini User Management</span>
       </div>
 
-      <div className="navbar-center">
-        {user.role === "admin" && (
-          <button onClick={() => navigate("/admin")}>
-            Admin Dashboard
-          </button>
-        )}
-        <button onClick={() => navigate("/profile")}>
-          Profile
-        </button>
-      </div>
-
       <div className="navbar-right">
         <span className="user-info">
           {user.fullName} ({user.role})
         </span>
-        <button className="logout-btn" onClick={handleLogout}>
+        {user.role === "admin" && currentPath !== "/admin" && (
+          <Button
+            variant="secondary"
+            onClick={() => navigate("/admin")}
+          >
+            Admin Dashboard
+          </Button>
+        )}
+
+        {currentPath !== "/profile" && (
+          <Button
+            variant="primary"
+            onClick={() => navigate("/profile")}
+          >
+            Profile
+          </Button>
+        )}
+
+        <Button variant="secondary" onClick={handleLogout}>
           Logout
-        </button>
+        </Button>
       </div>
     </nav>
   );

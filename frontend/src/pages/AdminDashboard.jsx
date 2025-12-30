@@ -78,7 +78,17 @@ export default function AdminDashboard() {
                       <td>{user.email}</td>
                       <td>{user.fullName}</td>
                       <td>{user.role}</td>
-                      <td>{user.status}</td>
+                      <td className="status-cell">
+                        <span
+                          className={
+                            user.status === "active"
+                              ? "row-active"
+                              : "row-inactive"
+                          }
+                        >
+                          {user.status}
+                        </span>
+                      </td>
                       <td>
                         {user.status === "active" ? (
                           <Button

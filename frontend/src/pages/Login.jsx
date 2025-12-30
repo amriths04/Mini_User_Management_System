@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 import "../css/Login.css";
+import {} from '../components/Button'
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -67,7 +68,9 @@ export default function Login() {
   };
 
   return (
+    <>
     <div className="login-container">
+      <h2>Mini User Management</h2>
       <h2>Login</h2>
 
       {error && <p className="error-text">{error}</p>}
@@ -96,5 +99,6 @@ export default function Login() {
         Don’t have an account? <Link to="/signup">Signup</Link>
       </p>
     </div>
+    </>
   );
 }

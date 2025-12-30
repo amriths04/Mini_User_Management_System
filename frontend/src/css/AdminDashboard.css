@@ -1,5 +1,5 @@
 .admin-container {
-  padding: 24px;
+  padding: 7px;
 }
 
 .table-wrapper {
@@ -16,7 +16,7 @@ th,
 td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
-  text-align: left;
+  text-align: center;
 }
 
 th {
@@ -38,4 +38,34 @@ th {
 .error-text {
   color: #c62828;
   margin-bottom: 10px;
+}
+
+/* Status cell alignment */
+.status-cell {
+  text-align: center;
+}
+
+/* Status tile */
+.row-active,
+.row-inactive {
+  display: inline-block;
+  min-width: 80px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: capitalize;
+  line-height: 1.2;
+}
+
+/* Active */
+.row-active {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+/* Inactive */
+.row-inactive {
+  background-color: #fdecea;
+  color: #c62828;
 }
