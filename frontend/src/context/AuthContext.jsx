@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
       setUser(me);
     } catch {
         localStorage.removeItem("token");
-        localStorage.removeItem("user");
       setUser(null);
     }finally{
         setAuthChecked(true);
