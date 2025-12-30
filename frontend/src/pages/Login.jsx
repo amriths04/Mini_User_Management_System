@@ -38,6 +38,7 @@ const handleLogin = async (e) => {
     setLoading(true);
 
     const data = await loginUser(email, password);
+    localStorage.setItem("user", JSON.stringify(data.user));
 
     // Role-based redirect
     if (data.user.role === "admin") {
