@@ -9,8 +9,7 @@ export default function Navbar() {
   if (!user) return null;
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    logout();
     navigate("/login", { replace: true });
   };
 

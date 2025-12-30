@@ -1,6 +1,7 @@
 import { useState,useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 import "../css/Login.css";
 
 export default function Login() {
@@ -8,23 +9,23 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const { refreshUser } = useAuth();
     const navigate = useNavigate();
 
-    useEffect(() => {
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
+    // useEffect(() => {
+    // const token = localStorage.getItem("token");
+    // const user = localStorage.getItem("user");
 
-    if (token && user) {
-      const parsedUser = JSON.parse(user);
+    // if (token && user) {
+    //   const parsedUser = JSON.parse(user);
 
-      if (parsedUser.role === "admin") {
-        navigate("/admin", { replace: true });
-      } else {
-        navigate("/profile", { replace: true });
-      }
-      }
-    }, [navigate]);
+    //   if (parsedUser.role === "admin") {
+    //     navigate("/admin", { replace: true });
+    //   } else {
+    //     navigate("/profile", { replace: true });
+    //   }
+    //   }
+    // }, [navigate]);
 
     const isValidEmail = (email) => {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -53,8 +54,8 @@ const handleLogin = async (e) => {
     setLoading(true);
 
     const data = await loginUser(email, password);
-    localStorage.setItem("user", JSON.stringify(data.user));
-
+    // localStorage.setItem("user", JSON.stringify(data.user));
+    await refreshUser();
     // Role-based redirect
     if (data.user.role === "admin") {
       navigate("/admin", { replace: true });

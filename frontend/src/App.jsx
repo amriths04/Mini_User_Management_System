@@ -5,8 +5,14 @@ import AdminDashboard from "./pages/AdminDashboard";
 import UserProfile from "./pages/UserProfile";
 import ProtectedRoute from "./routes/ProtectedRoutes";
 import AdminRoute from "./routes/AdminRoutes";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
+  const { authChecked } = useAuth();
+
+  if (!authChecked) {
+    return null;
+  }
   return (
     <BrowserRouter>
       <Routes>

@@ -5,12 +5,15 @@ import Button from "../components/Button";
 import Input from "../components/Input";
 import { getMe, updateProfile, changePassword } from "../services/userService";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function UserProfile() {
   const [userInfo, setUserInfo] = useState(null);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const { refreshUser } = useAuth();
+  const { user, authChecked, refreshUser, logout } = useAuth();
+  const navigate = useNavigate();
+
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -23,23 +26,17 @@ export default function UserProfile() {
   const [touched, setTouched] = useState({});
   const [fieldErrors, setFieldErrors] = useState({});
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setLoading(true);
-        const user = await getMe();
-        setUserInfo(user);
-        setFullName(user.fullName);
-        setEmail(user.email);
-      } catch (err) {
-        setError("Failed to load user profile");
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+  if (!user) return;
 
-    fetchUser();
-  }, []);
+  if (user) {
+    setUserInfo(user);
+    setFullName(user.fullName);
+    setEmail(user.email);
+  }
+}, [user]);
+
+
 
   const markTouched = (field) => {
     setTouched((prev) => ({ ...prev, [field]: true }));

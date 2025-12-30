@@ -5,28 +5,40 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const refreshUser = async () => {
     try {
       const me = await getMe();
       setUser(me);
     } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       setUser(null);
+    }finally{
+        setAuthChecked(true);
     }
   };
 
   useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) {
     refreshUser();
-  }, []);
+  } else {
+    setUser(null);
+    setAuthChecked(true);
+  }
+}, []);
+
 
   const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setUser(null);
-    window.location.href = "/login";
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, refreshUser, logout }}>
+    <AuthContext.Provider value={{ user, authChecked, refreshUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
