@@ -254,3 +254,11 @@ CI/CD pipeline implemented using GitHub Actions to automatically run backend tes
 > **NOTE:** Two users (`aman` and `admin`) are used for testing purposes with roles `user` and `admin`.  
 > These users are referenced in `backend/tests/auth-admin.test.js`.  
 > **Do NOT deactivate these users or change their passwords**, as automated tests depend on them.
+
+## 🔗 Project Links
+
+- **GitHub Repository:** https://github.com/amriths04/Mini_User_Management_System  
+- **Frontend (Vercel):** https://mini-user-management-system-two.vercel.app/login  
+- **Backend (Render):** https://purple-merit-backend-ez4y.onrender.com/  
+- **Walkthrough Video:** https://drive.google.com/file/d/1DfX0YK58HbfoBOqVdR7bB2t1DRAmbGBt/view?usp=sharing  
+- **Postman Collection:** https://www.postman.com/mission-meteorologist-84361860/public/collection/38173124-0238acd4-4969-4a22-ad08-fdf13effe676
