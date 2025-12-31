@@ -28,5 +28,5 @@ jobs:
         env:
           MONGO_URI: ${{ secrets.MONGO_URI }}
           JWT_SECRET: testsecret
-          JWT_EXPIRE: 1d
+          ACCESS_TOKEN_EXPIRY: 1d
         run: npm test
