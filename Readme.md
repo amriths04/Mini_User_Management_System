@@ -247,3 +247,6 @@ Authorization: Bearer <ADMIN_JWT_TOKEN>
   "message": "User activated successfully"
 }
 ```
+
+### CI/CD
+CI/CD pipeline implemented using GitHub Actions to automatically run backend tests on every push.
