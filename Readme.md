@@ -250,3 +250,7 @@ Authorization: Bearer <ADMIN_JWT_TOKEN>
 
 ### CI/CD
 CI/CD pipeline implemented using GitHub Actions to automatically run backend tests on every push.
+
+> **NOTE:** Two users (`aman` and `admin`) are used for testing purposes with roles `user` and `admin`.  
+> These users are referenced in `backend/tests/auth-admin.test.js`.  
+> **Do NOT deactivate these users or change their passwords**, as automated tests depend on them.
